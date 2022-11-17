@@ -34,18 +34,7 @@ def filter_devices(data):
     * Filtering can be done with AND or OR operator based on the selecetion of filter_type.
     """
     FIELDS = {
-        "tenant_group",
-        "tenant",
-        "region",
-        "site",
-        "rack",
-        "rack_group",
-        "role",
-        "platform",
-        "device_type",
-        "status",
-        "manufacturer",
-        "tags",
+        "serial",
     }
     query = {}
     for field in FIELDS:
@@ -68,11 +57,11 @@ def filter_devices(data):
         raise Exception(
             "The provided job parameters didn't match any devices detected by the scope. Please check the scope defined within Settings or select the correct job parameters to correctly match devices."
         )
-    devices_no_platform = devices_filtered.qs.filter(platform__isnull=True)
-    if devices_no_platform.count() > 0:
-        raise Exception(
-            f"The following device(s) {', '.join([device.name for device in devices_no_platform])} have no platform defined. Platform is required."
-        )
+    # devices_no_platform = devices_filtered.qs.filter(platform__isnull=True)
+    # if devices_no_platform.count() > 0:
+    #     raise Exception(
+    #         f"The following device(s) {', '.join([device.name for device in devices_no_platform])} have no platform defined. Platform is required."
+    #     )
 
     return devices_filtered.qs
 
