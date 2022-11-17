@@ -87,4 +87,4 @@ class NapalmGetJob(Job):
     def run(self, data, commit):
         query, devices = filter_devices(data)
         self.log_warning(message=query)
-        return asd()
+        return devices
