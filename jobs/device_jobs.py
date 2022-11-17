@@ -25,7 +25,6 @@ from django.core.exceptions import ObjectDoesNotExist
 
 import socket
 import re
-from device_filter import asd
 
 def filter_devices(data):
     """
