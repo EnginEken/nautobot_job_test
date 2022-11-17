@@ -39,12 +39,7 @@ def filter_devices(data):
     query = {}
     for field in FIELDS:
         if data.get(field):
-            query[f"{field}_id"] = data[field].values_list("pk", flat=True)
-    # Handle case where object is from single device run all.
-    if data.get("device") and isinstance(data["device"], Device):
-        query.update({"id": [str(data["device"].pk)]})
-    elif data.get("device"):
-        query.update({"id": data["device"].values_list("pk", flat=True)})
+            query[f"{field}"] = data[field]
 
     base_qs = Device.objects.all()
 
