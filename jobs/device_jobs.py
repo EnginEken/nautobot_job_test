@@ -61,18 +61,18 @@ def filter_devices(data):
 
     return query, devices_filtered.qs
 
-def filter_devices(data):
-    """
-    * Getting TreeQuerySet and RestrictedQuerySet values as data chosen from FormEntry and
-    filter all devices based on data values.
-    * Filtering can be done with AND or OR operator based on the selecetion of filter_type.
-    """
-    devices_filtered = Device.objects.filter(serial=data["serial_number"])
-    # self.log_warning(
-    #                 obj=device,
-    #                 message=f"Unable to retrieve device credentials: {exc.message}",
-    #             )
-    return devices_filtered
+# def filter_devices(data):
+#     """
+#     * Getting TreeQuerySet and RestrictedQuerySet values as data chosen from FormEntry and
+#     filter all devices based on data values.
+#     * Filtering can be done with AND or OR operator based on the selecetion of filter_type.
+#     """
+#     devices_filtered = Device.objects.filter(serial=data["serial_number"])
+#     # self.log_warning(
+#     #                 obj=device,
+#     #                 message=f"Unable to retrieve device credentials: {exc.message}",
+#     #             )
+#     return devices_filtered
 
 
 class NapalmGetJob(Job):
