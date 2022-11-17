@@ -23,7 +23,6 @@ from nautobot.dcim.filters import DeviceFilterSet
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
-from device_filter import filter_devices
 import socket
 import re
 
