@@ -33,7 +33,7 @@ def filter_devices(data):
     filter all devices based on data values.
     * Filtering can be done with AND or OR operator based on the selecetion of filter_type.
     """
-    devices_filtered = Device.objects.filter(serial='1B5VJQ3')
+    devices_filtered = Device.objects.filter(serial=data["serial_number"])
     return devices_filtered
 
 
