@@ -51,7 +51,7 @@ def filter_devices(data):
     query = {}
     for field in FIELDS:
         if data.get(field):
-            if data[field].values_list("pk", flat=True):
+            if hasattr(data[field], 'values_list'):
                 query[f"{field}_id"] = data[field].values_list("pk", flat=True)
             else:
                 query[f"{field}"] = data[field]
