@@ -34,12 +34,27 @@ def filter_devices(data):
     * Filtering can be done with AND or OR operator based on the selecetion of filter_type.
     """
     FIELDS = {
+        "tenant_group",
+        "tenant",
+        "region",
+        "site",
+        "rack",
+        "rack_group",
+        "role",
+        "platform",
+        "device_type",
+        "status",
+        "manufacturer",
+        "tags",
         "serial"
     }
     query = {}
     for field in FIELDS:
         if data.get(field):
-            query[f"{field}"] = data[field]
+            if data[field].values_list("pk", flat=True):
+                query[f"{field}_id"] = data[field].values_list("pk", flat=True)
+            else:
+                query[f"{field}"] = data[field]
     # Handle case where object is from single device run all.
     if data.get("device") and isinstance(data["device"], Device):
         query.update({"id": [str(data["device"].pk)]})
@@ -60,19 +75,6 @@ def filter_devices(data):
 
 
     return query, devices_filtered.qs
-
-# def filter_devices(data):
-#     """
-#     * Getting TreeQuerySet and RestrictedQuerySet values as data chosen from FormEntry and
-#     filter all devices based on data values.
-#     * Filtering can be done with AND or OR operator based on the selecetion of filter_type.
-#     """
-#     devices_filtered = Device.objects.filter(serial=data["serial_number"])
-#     # self.log_warning(
-#     #                 obj=device,
-#     #                 message=f"Unable to retrieve device credentials: {exc.message}",
-#     #             )
-#     return devices_filtered
 
 
 class NapalmGetJob(Job):
