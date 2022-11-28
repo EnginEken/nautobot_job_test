@@ -103,7 +103,7 @@ class DeviceMoveJob(Job):
             )
         else:
             device = devices[0]
-        dest_site = data['destination_site']
+        dest_site = Site.objects.filter(id=data['destination_site'])[0]
         self.log_warning(f"current device site {device.site.name}")
         device.site = dest_site
         self.log_warning(f"Changed site {device.site.name}")
