@@ -82,6 +82,14 @@ class DeviceMoveJob(Job):
         description = "Job for changing device site/rack"
     
     serial = StringVar()
+    destination_site = MultiObjectVar(
+        model=Site,
+        required=False,
+        query_params={
+            "region_id": "$region",
+            "tenant_group_id": "$tenant_group",
+        },
+    )
 
     def run(self, data, commit):
         devices = filter_devices(data)
@@ -90,7 +98,13 @@ class DeviceMoveJob(Job):
             device = devices[0]
         elif devices.count() == 0:
             self.log_failure(message=f"No device found with the given serial number")
+            raise Exception(
+                "No device found with the given serial number"
+            )
         else:
             device = devices[0]
-        
-        return device
+        dest_site = data['destination_site']
+        self.log_warning(f"current device site {device.site.name}")
+        device.site = dest_site
+        self.log_warning(f"Changed site {device.site.name}")
+        return device.site
