@@ -33,18 +33,18 @@ def filter_devices(data):
     * Filtering can be done with AND or OR operator based on the selecetion of filter_type.
     """
     FIELDS = {
-        "tenant_group",
-        "tenant",
-        "region",
-        "site",
-        "rack",
-        "rack_group",
-        "role",
-        "platform",
-        "device_type",
-        "status",
-        "manufacturer",
-        "tags",
+        # "tenant_group",
+        # "tenant",
+        # "region",
+        # "site",
+        # "rack",
+        # "rack_group",
+        # "role",
+        # "platform",
+        # "device_type",
+        # "status",
+        # "manufacturer",
+        # "tags",
         "serial"
     }
     query = {}
@@ -73,18 +73,24 @@ def filter_devices(data):
         )
 
 
-    return query, devices_filtered.qs
+    return devices_filtered.qs
 
 
-class NapalmGetJob(Job):
+class DeviceMoveJob(Job):
     class Meta:
-        name = "Device Remove Flow Job"
-        description = "Device removal"
-        has_sensitive_variables = False
+        name = "Device Move"
+        description = "Job for changing device site/rack"
     
     serial = StringVar()
 
     def run(self, data, commit):
-        query, devices = filter_devices(data)
-        self.log_warning(message=query)
-        return devices
+        devices = filter_devices(data)
+        if devices.count() >= 1:
+            self.log_warning(message=f"Found more than 1 device. Using first one.")
+            device = devices[0]
+        elif devices.count() == 0:
+            self.log_failure(message=f"No device found with the given serial number")
+        else:
+            device = devices[0]
+        
+        return device
