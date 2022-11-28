@@ -189,6 +189,7 @@ class NapalmGetJob(Job):
     class Meta:
         name = "LLDP-Nautobot Interface Info Comparison"
         description = "Get Napalm Methods Info from the devices with the given filters and compare them with the configured interface information in Nautobot"
+        has_sensitive_variables = False
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
@@ -504,6 +505,7 @@ class InterfaceRoleUpdateJob(Job):
         name = "Interface Role Edit"
         description = "Edit interfaces role for the filtered Device(s)"
         commit_default = False
+        has_sensitive_variables = False
 
     tenant_group = FormEntry.tenant_group
     tenant = FormEntry.tenant
