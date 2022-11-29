@@ -90,9 +90,7 @@ class DeviceMoveJob(Job):
         model=Rack,
         required=False,
         query_params={
-            "site_id": "$site",
-            "region_id": "$region",
-            "rack_group_id": "$rack_group",
+            "site_id": "$destination_site",
         },
     )
 
