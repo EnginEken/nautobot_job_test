@@ -26,6 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import socket
 import re
 
+
 def filter_devices(data):
     """
     * Getting TreeQuerySet and RestrictedQuerySet values as data chosen from FormEntry and
@@ -50,7 +51,7 @@ def filter_devices(data):
     query = {}
     for field in FIELDS:
         if data.get(field):
-            if hasattr(data[field], 'values_list'):
+            if hasattr(data[field], "values_list"):
                 query[f"{field}_id"] = data[field].values_list("pk", flat=True)
             else:
                 query[f"{field}"] = data[field]
@@ -72,7 +73,6 @@ def filter_devices(data):
             "The provided job parameters didn't match any devices detected by the scope. Please check the scope defined within Settings or select the correct job parameters to correctly match devices."
         )
 
-
     return devices_filtered.qs
 
 
@@ -80,14 +80,24 @@ class DeviceMoveJob(Job):
     class Meta:
         name = "Device Move"
         description = "Job for changing device site/rack"
-    
+
     serial = StringVar()
     destination_site = ObjectVar(
         model=Site,
         required=False,
+    )
+    rack_group = ObjectVar(
+        model=RackGroup,
+        required=False,
+        query_params={"region_id": "$region", "site_id": "$site"},
+    )
+    rack = ObjectVar(
+        model=Rack,
+        required=False,
         query_params={
+            "site_id": "$site",
             "region_id": "$region",
-            "tenant_group_id": "$tenant_group",
+            "rack_group_id": "$rack_group",
         },
     )
 
@@ -98,14 +108,16 @@ class DeviceMoveJob(Job):
             device = devices[0]
         elif devices.count() == 0:
             self.log_failure(message=f"No device found with the given serial number")
-            raise Exception(
-                "No device found with the given serial number"
-            )
+            raise Exception("No device found with the given serial number")
         else:
             device = devices[0]
-        dest_site = Site.objects.get(id=data['destination_site'].id)
+        dest_site = Site.objects.get(id=data["destination_site"].id)
+        dest_rack = Rack.objects.get(id=data["rack"].id)
+        dest_rack_group = RackGroup.objects.get(id=data["rack_group"].id)
         self.log_warning(f"current device site {device.site.name}")
         device.site = dest_site
+        device.rack = dest_rack
+        device.rack.group = dest_rack_group
         device.validated_save()
         self.log_warning(f"Changed site {device.site.name}")
         return device.site
