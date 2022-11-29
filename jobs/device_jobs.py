@@ -82,6 +82,9 @@ class DeviceMoveJob(Job):
         description = "Job for changing device site/rack"
 
     serial = StringVar()
+    # ObjectVar baggio tarafında sıkıntı olabilir. Çünkü ObjectVar ya da MultiObjectVar datası ile 
+    # job run etmek için data olarak seçilen şeylerin uuid si gerekiyor. Baggio tarafında önce bunların 
+    # elde edilmesi sonra istek atılması gerekmek
     destination_site = ObjectVar(
         model=Site,
         required=False,
@@ -93,6 +96,8 @@ class DeviceMoveJob(Job):
             "site_id": "$destination_site",
         },
     )
+    # destination_site = StringVar()
+    # rack = StringVar()
 
     def run(self, data, commit):
         devices = filter_devices(data)
@@ -104,6 +109,13 @@ class DeviceMoveJob(Job):
             raise Exception("No device found with the given serial number")
         else:
             device = devices[0]
+
+        # try:
+        #     dest_site = Site.objects.get(name=data["destination_site"])
+        # except Site.DoesNotExist as err:
+        #     self.log_failure(f"Site can not be found with the given name {data['destination_site']}")
+        #     raise err
+
         dest_site = Site.objects.get(id=data["destination_site"].id)
         dest_rack = Rack.objects.get(id=data["rack"].id)
         self.log_warning(f"current device site {device.site.name}")
