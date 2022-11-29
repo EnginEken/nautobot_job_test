@@ -86,11 +86,6 @@ class DeviceMoveJob(Job):
         model=Site,
         required=False,
     )
-    rack_group = ObjectVar(
-        model=RackGroup,
-        required=False,
-        query_params={"region_id": "$region", "site_id": "$site"},
-    )
     rack = ObjectVar(
         model=Rack,
         required=False,
@@ -113,11 +108,9 @@ class DeviceMoveJob(Job):
             device = devices[0]
         dest_site = Site.objects.get(id=data["destination_site"].id)
         dest_rack = Rack.objects.get(id=data["rack"].id)
-        dest_rack_group = RackGroup.objects.get(id=data["rack_group"].id)
         self.log_warning(f"current device site {device.site.name}")
         device.site = dest_site
         device.rack = dest_rack
-        device.rack.group = dest_rack_group
         device.validated_save()
         self.log_warning(f"Changed site {device.site.name}")
         return device.site
