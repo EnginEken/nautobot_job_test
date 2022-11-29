@@ -82,7 +82,7 @@ class DeviceMoveJob(Job):
         description = "Job for changing device site/rack"
     
     serial = StringVar()
-    destination_site = MultiObjectVar(
+    destination_site = ObjectVar(
         model=Site,
         required=False,
         query_params={
