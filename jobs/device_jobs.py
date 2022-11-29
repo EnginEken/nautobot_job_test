@@ -104,8 +104,8 @@ class DeviceMoveJob(Job):
         else:
             device = devices[0]
         dest_site = Site.objects.get(id=data['destination_site'])
-        self.log_warning(f"current device site {device.site.name}")
-        device.site = dest_site
-        device.site.validated_save()
-        self.log_warning(f"Changed site {device.site.name}")
-        return device.site
+        # self.log_warning(f"current device site {device.site.name}")
+        # device.site = dest_site
+        # device.site.validated_save()
+        # self.log_warning(f"Changed site {device.site.name}")
+        return device, dest_site
