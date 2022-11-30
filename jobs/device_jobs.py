@@ -83,9 +83,7 @@ class DeviceMoveJob(Job):
         description = "Job for changing device site/rack"
 
     serial = StringVar()
-    # ObjectVar baggio tarafında sıkıntı olabilir. Çünkü ObjectVar ya da MultiObjectVar datası ile 
-    # job run etmek için data olarak seçilen şeylerin uuid si gerekiyor. Baggio tarafında önce bunların 
-    # elde edilmesi sonra istek atılması gerekmek
+
     destination_site = ObjectVar(
         model=Site,
         required=False,
@@ -97,18 +95,16 @@ class DeviceMoveJob(Job):
             "site_id": "$destination_site",
         },
     )
-    position = IntegerVar(
-        required=False,
-        widget=APISelect(
-            api_url="/api/dcim/racks/{{rack}}/elevation/",
-            attrs={
-                "disabled-indicator": "device",
-                "data-query-param-face": '["$face"]',
-            },
-        ),
-    )
-    # destination_site = StringVar()
-    # rack = StringVar()
+    # position = IntegerVar(
+    #     required=False,
+    #     widget=APISelect(
+    #         api_url="/api/dcim/racks/{{rack}}/elevation/",
+    #         attrs={
+    #             "disabled-indicator": "device",
+    #             "data-query-param-face": '["$face"]',
+    #         },
+    #     ),
+    # )
 
     def run(self, data, commit):
         devices = filter_devices(data)
@@ -129,10 +125,9 @@ class DeviceMoveJob(Job):
 
         dest_site = Site.objects.get(id=data["destination_site"].id)
         dest_rack = Rack.objects.get(id=data["rack"].id)
-        self.log_warning(f"current device site {device.site.name}")
         device.site = dest_site
         device.rack = dest_rack
-        device.position = data["position"]
+        # device.position = data["position"]
         device.validated_save()
-        self.log_warning(f"Changed site {device.site.name}")
+        # self.log_warning(f"Changed site {device.site.name}")
         return device.site
