@@ -91,19 +91,20 @@ class DeviceMoveJob(Job):
             "site_id": "$destination_site",
         },
     )
-    # position = IntegerVar(
-    #     required=False,
-    #     widget=APISelect(
-    #         api_url="/api/dcim/racks/{{rack}}/elevation/",
-    #         attrs={
-    #             "disabled-indicator": "device",
-    #             "data-query-param-face": '["$face"]',
-    #         },
-    #     ),
-    # )
+    position = IntegerVar(
+        required=False,
+        widget=APISelect(
+            api_url="/api/dcim/racks/{{rack}}/elevation/",
+            attrs={
+                "disabled-indicator": "device",
+                "data-query-param-face": '["$face"]',
+            },
+        ),
+    )
 
     def run(self, data, commit):
         devices = filter_devices(data)
+        self.log_warning(f"{devices.count()}: {devices}")
         if devices.count() >= 1:
             self.log_warning(message=f"Found more than 1 device. Using first one.")
             device = devices[0]
@@ -113,20 +114,15 @@ class DeviceMoveJob(Job):
         else:
             device = devices[0]
 
-        # try:
-        #     dest_site = Site.objects.get(name=data["destination_site"])
-        # except Site.DoesNotExist as err:
-        #     self.log_failure(f"Site can not be found with the given name {data['destination_site']}")
-        #     raise err
-
         dest_site = Site.objects.get(id=data["destination_site"].id)
         dest_rack = Rack.objects.get(id=data["rack"].id)
         device.site = dest_site
         device.rack = dest_rack
-        #device.position = data["position"]
+        device.position = data["position"]
         try:
             device.validated_save()
         except ValidationError as err:
+            self.log_failure(f"Device Validation Error: {err}")
             raise err
         # self.log_warning(f"Changed site {device.site.name}")
-        return device.site
+        return device
