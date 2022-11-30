@@ -99,7 +99,6 @@ class DeviceMoveJob(Job):
     )
     position = IntegerVar(
         required=False,
-        help_text="The lowest-numbered unit occupied by the device",
         widget=APISelect(
             api_url="/api/dcim/racks/{{rack}}/elevation/",
             attrs={
