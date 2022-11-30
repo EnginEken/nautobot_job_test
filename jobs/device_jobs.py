@@ -253,10 +253,20 @@ class DeviceMover(Job):
         name = "Device Location Changer"
         description = "Job for changing device site/rack/position"
 
-    device_serial = FormEntry.serial
-    destination_site = FormEntry.site
-    destination_rack = FormEntry.rack
+    serial = FormEntry.serial
+    destination_site = ObjectVar(
+        model=Site,
+        required=False,
+    )
+    destination_rack = ObjectVar(
+        model=Rack,
+        required=False,
+        query_params={
+            "site_id": "$destination_site",
+        },
+    )
     destination_u = FormEntry.position
+
 
     def run(self, data, commit):
         devices = filter_devices(data)
