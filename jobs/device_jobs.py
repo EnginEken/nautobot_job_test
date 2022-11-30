@@ -13,7 +13,7 @@ from nautobot.dcim.models import (
 from nautobot.utilities.forms import APISelect
 # from nautobot.tenancy.models import TenantGroup, Tenant
 # from nautobot.extras.models import Status, Tag, CustomField
-# from nautobot.extras.jobs import *
+from nautobot.extras.jobs import *
 # from nautobot.extras.choices import (
 #     SecretsGroupAccessTypeChoices,
 #     SecretsGroupSecretTypeChoices,
