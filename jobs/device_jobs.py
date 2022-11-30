@@ -10,6 +10,7 @@ from nautobot.dcim.models import (
     Platform,
     Interface,
 )
+from nautobot.utilities.forms import APISelect
 from nautobot.tenancy.models import TenantGroup, Tenant
 from nautobot.extras.models import Status, Tag, CustomField
 from nautobot.extras.jobs import *
@@ -95,6 +96,17 @@ class DeviceMoveJob(Job):
         query_params={
             "site_id": "$destination_site",
         },
+    )
+    position = IntegerVar(
+        required=False,
+        help_text="The lowest-numbered unit occupied by the device",
+        widget=APISelect(
+            api_url="/api/dcim/racks/{{rack}}/elevation/",
+            attrs={
+                "disabled-indicator": "device",
+                "data-query-param-face": '["$face"]',
+            },
+        ),
     )
     # destination_site = StringVar()
     # rack = StringVar()
