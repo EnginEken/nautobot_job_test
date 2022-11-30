@@ -104,20 +104,23 @@ class DeviceMoveJob(Job):
 
     def run(self, data, commit):
         devices = filter_devices(data)
-        self.log_warning(f"{devices.count()}: {devices}")
-        if devices.count() >= 1:
+        if devices.count() > 1:
             self.log_warning(message=f"Found more than 1 device. Using first one.")
             device = devices[0]
         elif devices.count() == 0:
             self.log_failure(message=f"No device found with the given serial number")
             raise Exception("No device found with the given serial number")
         else:
+            self.log_warning(message=f"Found 1 device with given serial number.")
             device = devices[0]
-
+        
         dest_site = Site.objects.get(id=data["destination_site"].id)
         dest_rack = Rack.objects.get(id=data["rack"].id)
+        self.log_info(message=f"Setting device site to {dest_site}")
         device.site = dest_site
+        self.log_info(message=f"Setting device rack to {dest_rack}")
         device.rack = dest_rack
+        self.log_info(message=f"Setting device position to U{data['position']}")
         device.position = data["position"]
         try:
             device.validated_save()
@@ -125,4 +128,5 @@ class DeviceMoveJob(Job):
             self.log_failure(f"Device Validation Error: {err}")
             raise err
         # self.log_warning(f"Changed site {device.site.name}")
-        return device
+        self.log_success(obj=device, message=f"Device location changed successfully!")
+        return device.site, device.rack, device.position
