@@ -132,6 +132,7 @@ class DeviceMoveJob(Job):
         self.log_warning(f"current device site {device.site.name}")
         device.site = dest_site
         device.rack = dest_rack
+        device.position = data["position"]
         device.validated_save()
         self.log_warning(f"Changed site {device.site.name}")
         return device.site
