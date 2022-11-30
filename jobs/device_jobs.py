@@ -11,22 +11,18 @@ from nautobot.dcim.models import (
     Interface,
 )
 from nautobot.utilities.forms import APISelect
-from nautobot.tenancy.models import TenantGroup, Tenant
-from nautobot.extras.models import Status, Tag, CustomField
-from nautobot.extras.jobs import *
-from nautobot.extras.choices import (
-    SecretsGroupAccessTypeChoices,
-    SecretsGroupSecretTypeChoices,
-)
-from nautobot.extras.secrets.exceptions import SecretError
+# from nautobot.tenancy.models import TenantGroup, Tenant
+# from nautobot.extras.models import Status, Tag, CustomField
+# from nautobot.extras.jobs import *
+# from nautobot.extras.choices import (
+#     SecretsGroupAccessTypeChoices,
+#     SecretsGroupSecretTypeChoices,
+# )
+# from nautobot.extras.secrets.exceptions import SecretError
 from nautobot.dcim.filters import DeviceFilterSet
 
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-
-import socket
-import re
-
+# from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 def filter_devices(data):
     """
@@ -127,7 +123,10 @@ class DeviceMoveJob(Job):
         dest_rack = Rack.objects.get(id=data["rack"].id)
         device.site = dest_site
         device.rack = dest_rack
-        # device.position = data["position"]
-        device.validated_save()
+        #device.position = data["position"]
+        try:
+            device.validated_save()
+        except ValidationError as err:
+            raise err
         # self.log_warning(f"Changed site {device.site.name}")
         return device.site
