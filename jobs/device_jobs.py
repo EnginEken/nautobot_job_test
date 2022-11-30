@@ -151,7 +151,7 @@ class FormEntry:
     position = IntegerVar(
         required=False,
         widget=APISelect(
-            api_url="/api/dcim/racks/{{rack}}/elevation/",
+            api_url="/api/dcim/racks/{{destination_rack}}/elevation/",
             attrs={
                 "disabled-indicator": "device",
             },
