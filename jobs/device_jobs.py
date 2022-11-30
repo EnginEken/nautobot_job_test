@@ -105,13 +105,13 @@ class DeviceMoveJob(Job):
     def run(self, data, commit):
         devices = filter_devices(data)
         if devices.count() > 1:
-            self.log_warning(message=f"Found more than 1 device. Using first one.")
+            self.log_info(message=f"Found more than 1 device. Using first one.")
             device = devices[0]
         elif devices.count() == 0:
             self.log_failure(message=f"No device found with the given serial number")
             raise Exception("No device found with the given serial number")
         else:
-            self.log_warning(message=f"Found 1 device with given serial number.")
+            self.log_info(message=f"Found 1 device with given serial number.")
             device = devices[0]
         
         dest_site = Site.objects.get(id=data["destination_site"].id)
