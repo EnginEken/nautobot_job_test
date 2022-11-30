@@ -92,9 +92,9 @@ class DeviceMoveJob(Job):
     rack = ObjectVar(
         model=Rack,
         required=False,
-        # query_params={
-        #     "site_id": "$destination_site",
-        # },
+        query_params={
+            "site_id": "$destination_site",
+        },
     )
     # destination_site = StringVar()
     # rack = StringVar()
