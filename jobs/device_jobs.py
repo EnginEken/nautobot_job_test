@@ -247,7 +247,7 @@ class DeviceDetailChecker(Job):
         # self.log("Listing duplicated IP Addresses")
         # for ip_addr, obj in self.dup_ip_address().items():
         #     self.log_warning(obj, f"{ip_addr} is a duplicated address")
-        return query
+        return query, filtered_devices.count()
 
 class DeviceMover(Job):
     class Meta:
