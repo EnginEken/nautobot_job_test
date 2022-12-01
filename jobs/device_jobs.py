@@ -175,8 +175,8 @@ class DeviceDetailChecker(Job):
     manufacturer = FormEntry.manufacturer
     platform = FormEntry.platform
     device_type = FormEntry.device_type
-    device = FormEntry.device
     status = FormEntry.status
+    device = FormEntry.device
     tag = FormEntry.tag
 
     def null_serial(self, devices):
