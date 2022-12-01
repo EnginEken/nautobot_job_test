@@ -67,7 +67,7 @@ def filter_devices(data):
             "The provided job parameters didn't match any devices detected by the scope. Please check the scope defined within Settings or select the correct job parameters to correctly match devices."
         )
 
-    return devices_filtered.qs
+    return query, devices_filtered.qs
 
 
 class FormEntry:
@@ -223,7 +223,8 @@ class DeviceDetailChecker(Job):
         return {k: v for k, v in seen.items() if len(v) > 1}
 
     def run(self, data, commit=False):
-        filtered_devices = filter_devices(data)
+        query, filtered_devices = filter_devices(data)
+        self.log(f"{query}")
         self.log("Listing devices without serial number")
         for dev in self.null_serial(filtered_devices):
             self.log_warning(dev, "Missing serial number")
@@ -246,7 +247,7 @@ class DeviceDetailChecker(Job):
         # self.log("Listing duplicated IP Addresses")
         # for ip_addr, obj in self.dup_ip_address().items():
         #     self.log_warning(obj, f"{ip_addr} is a duplicated address")
-
+        return query
 
 class DeviceMover(Job):
     class Meta:
@@ -281,6 +282,8 @@ class DeviceMover(Job):
             device = devices[0]
 
         dest_site = Site.objects.get(id=data["destination_site"].id)
+        inventory = True if 'STR' in dest_site.name else False
+        
         dest_rack = Rack.objects.get(id=data["destination_rack"].id)
         self.log_info(message=f"Setting device site to {dest_site}")
         device.site = dest_site
