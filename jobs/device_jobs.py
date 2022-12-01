@@ -267,11 +267,13 @@ class DeviceMover(Job):
     )
     destination_u = FormEntry.position
 
+    _INVENTORY_ROLE_ID = "37b7b3c9-20d0-4d17-bab4-221f79d94be4" # Şu an test nautobotu için id bu. Prod a alırken proddan almak gerekiyor.
+    _STATUS_INVENTORY_ID = "019b2a93-3e3f-4ed9-92c4-ce5da0729348"
 
     def run(self, data, commit):
         
         devices = filter_devices(data)
-        self.log_info(message=f"{devices.count()}")
+        
         if devices.count() > 1:
             self.log_info(message=f"Found more than 1 device. Using first one.")
             device = devices[0]
@@ -285,21 +287,31 @@ class DeviceMover(Job):
             device = devices[0]
 
         dest_site = Site.objects.get(id=data["destination_site"].id)
+        dest_rack = Rack.objects.get(id=data["destination_rack"].id)
+        dest_position = data["destination_u"]
         is_inventory_item = True if 'STR' in dest_site.name else False
         
-        dest_rack = Rack.objects.get(id=data["destination_rack"].id)
-        
-        self.log_info(message=f"Setting device site to {dest_site}")
-        device.site = dest_site
-        
-        self.log_info(message=f"Setting device rack to {dest_rack}")
-        device.rack = dest_rack
-        
-        self.log_info(message=f"Setting device position to U{data['destination_u']}")
-        device.position = data["destination_u"]
         if is_inventory_item:
-            device.name = ""
-            device.role = DeviceRole.objects.get(id="37b7b3c9-20d0-4d17-bab4-221f79d94be4")
+            device.clean()
+
+            self.log_info(message=f"Setting device site to {dest_site}")
+            device.site = dest_site
+            
+            self.log_info(message=f"Setting device rack to {dest_rack}")
+            device.rack = dest_rack
+            
+            self.log_info(message=f"Setting device position to U{data['destination_u']}")
+            device.position = dest_position
+
+            # device.name = ""
+            # device.role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
+            # device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
+            # device.asset_tag = ""
+            # device.tenant = None
+            # device.primary_ip4 = None
+            # device.secrets_group = None
+            # device.cluster = None
+            # device.virtual_chassis = None
         try:
             device.validated_save()
         
