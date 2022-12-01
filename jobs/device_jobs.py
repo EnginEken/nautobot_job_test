@@ -289,29 +289,28 @@ class DeviceMover(Job):
         dest_site = Site.objects.get(id=data["destination_site"].id)
         dest_rack = Rack.objects.get(id=data["destination_rack"].id)
         dest_position = data["destination_u"]
+        self.log_info(message=f"Setting device site to {dest_site}")
+        device.site = dest_site
+        
+        self.log_info(message=f"Setting device rack to {dest_rack}")
+        device.rack = dest_rack
+        
+        self.log_info(message=f"Setting device position to U{data['destination_u']}")
+        device.position = dest_position
+        
         is_inventory_item = True if 'STORAGE' in dest_site.name else False
         
         if is_inventory_item:
-            device.clean()
-
-            self.log_info(message=f"Setting device site to {dest_site}")
-            device.site = dest_site
-            
-            self.log_info(message=f"Setting device rack to {dest_rack}")
-            device.rack = dest_rack
-            
-            self.log_info(message=f"Setting device position to U{data['destination_u']}")
-            device.position = dest_position
-
-            # device.name = ""
-            # device.role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
-            # device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
-            # device.asset_tag = ""
-            # device.tenant = None
-            # device.primary_ip4 = None
-            # device.secrets_group = None
-            # device.cluster = None
-            # device.virtual_chassis = None
+            device.name = ""
+            device.role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
+            device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
+            device.asset_tag = ""
+            device.tenant = None
+            device.primary_ip4 = None
+            device.secrets_group = None
+            device.cluster = None
+            device.virtual_chassis = None
+        
         try:
             device.validated_save()
         
