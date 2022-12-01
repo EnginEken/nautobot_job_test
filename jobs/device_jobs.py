@@ -151,7 +151,7 @@ class FormEntry:
     position = IntegerVar(
         required=False,
         widget=APISelect(
-            api_url="/api/dcim/racks/{{rack}}/elevation/",
+            api_url="/api/dcim/racks/{{destination_rack}}/elevation/",
             attrs={
                 "disabled-indicator": "device",
             },
@@ -258,14 +258,13 @@ class DeviceMover(Job):
         model=Site,
         required=False,
     )
-    destination_rack = FormEntry.rack
-    # destination_rack = ObjectVar(
-    #     model=Rack,
-    #     required=False,
-    #     query_params={
-    #         "site_id": "$destination_site",
-    #     },
-    # )
+    destination_rack = ObjectVar(
+        model=Rack,
+        required=False,
+        query_params={
+            "site_id": "$destination_site",
+        },
+    )
     destination_u = FormEntry.position
 
 
