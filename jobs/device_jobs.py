@@ -289,7 +289,7 @@ class DeviceMover(Job):
         dest_site = Site.objects.get(id=data["destination_site"].id)
         dest_rack = Rack.objects.get(id=data["destination_rack"].id)
         dest_position = data["destination_u"]
-        is_inventory_item = True if 'STR' in dest_site.name else False
+        is_inventory_item = True if 'STORAGE' in dest_site.name else False
         
         if is_inventory_item:
             device.clean()
