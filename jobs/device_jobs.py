@@ -269,6 +269,7 @@ class DeviceMover(Job):
 
     _INVENTORY_ROLE_ID = "37b7b3c9-20d0-4d17-bab4-221f79d94be4" # Şu an test nautobotu için id bu. Prod a alırken proddan almak gerekiyor.
     _STATUS_INVENTORY_ID = "019b2a93-3e3f-4ed9-92c4-ce5da0729348"
+    _DELETABLE_FIELDS_FOR_INVENTORY = ['name', 'asset_tag', 'tenant', 'primary_ip4', 'primary_ip6', 'cluster', 'virtual_chassis', 'device_redundancy_group', 'device_redundancy_group_priority', 'vc_position', 'vc_priority', 'comments', 'secrets_group', 'objects']
 
     def run(self, data, commit):
         
@@ -301,15 +302,11 @@ class DeviceMover(Job):
         is_inventory_item = True if 'STORAGE' in dest_site.name else False
         
         if is_inventory_item:
-            device.name = ""
             device.device_role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
             device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
-            device.asset_tag = None
-            device.tenant = None
-            device.primary_ip4 = None
-            device.secrets_group = None
-            device.cluster = None
-            device.virtual_chassis = None
+
+            for attr in self._DELETABLE_FIELDS_FOR_INVENTORY:
+                setattr(device, attr, None)
         
         try:
             device.validated_save()
