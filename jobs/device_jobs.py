@@ -302,7 +302,7 @@ class DeviceMover(Job):
         
         if is_inventory_item:
             device.name = ""
-            device.role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
+            device.device_role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
             device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
             device.asset_tag = ""
             device.tenant = None
