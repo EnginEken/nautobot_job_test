@@ -67,7 +67,7 @@ def filter_devices(data):
             "The provided job parameters didn't match any devices detected by the scope. Please check the scope defined within Settings or select the correct job parameters to correctly match devices."
         )
 
-    return query, devices_filtered.qs
+    return devices_filtered.qs
 
 
 class FormEntry:
@@ -175,8 +175,8 @@ class DeviceDetailChecker(Job):
     manufacturer = FormEntry.manufacturer
     platform = FormEntry.platform
     device_type = FormEntry.device_type
-    status = FormEntry.status
     device = FormEntry.device
+    status = FormEntry.status
     tag = FormEntry.tag
 
     def null_serial(self, devices):
@@ -223,8 +223,7 @@ class DeviceDetailChecker(Job):
         return {k: v for k, v in seen.items() if len(v) > 1}
 
     def run(self, data, commit=False):
-        query, filtered_devices = filter_devices(data)
-        self.log(f"{query}")
+        filtered_devices = filter_devices(data)
         self.log("Listing devices without serial number")
         for dev in self.null_serial(filtered_devices):
             self.log_warning(dev, "Missing serial number")
@@ -247,7 +246,7 @@ class DeviceDetailChecker(Job):
         # self.log("Listing duplicated IP Addresses")
         # for ip_addr, obj in self.dup_ip_address().items():
         #     self.log_warning(obj, f"{ip_addr} is a duplicated address")
-        return query, filtered_devices.count()
+
 
 class DeviceMover(Job):
     class Meta:
@@ -270,31 +269,44 @@ class DeviceMover(Job):
 
 
     def run(self, data, commit):
+        
         devices = filter_devices(data)
+        self.log_info(message=f"{devices.count()}")
         if devices.count() > 1:
             self.log_info(message=f"Found more than 1 device. Using first one.")
             device = devices[0]
+        
         elif devices.count() == 0:
             self.log_failure(message=f"No device found with the given serial number")
             raise Exception("No device found with the given serial number")
+        
         else:
             self.log_info(message=f"Found 1 device with given serial number.")
             device = devices[0]
 
         dest_site = Site.objects.get(id=data["destination_site"].id)
-        inventory = True if 'STR' in dest_site.name else False
+        is_inventory_item = True if 'STR' in dest_site.name else False
         
         dest_rack = Rack.objects.get(id=data["destination_rack"].id)
+        
         self.log_info(message=f"Setting device site to {dest_site}")
         device.site = dest_site
+        
         self.log_info(message=f"Setting device rack to {dest_rack}")
         device.rack = dest_rack
+        
         self.log_info(message=f"Setting device position to U{data['destination_u']}")
         device.position = data["destination_u"]
+        if is_inventory_item:
+            device.name = ""
+            device.role = DeviceRole.objects.get(id="37b7b3c9-20d0-4d17-bab4-221f79d94be4")
         try:
             device.validated_save()
+        
         except ValidationError as err:
             self.log_failure(f"Device Validation Error: {err}")
             raise err
+        
         self.log_success(obj=device, message=f"Device location changed successfully!")
+        
         return device.site, device.rack, device.position
