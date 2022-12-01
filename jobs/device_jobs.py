@@ -304,7 +304,7 @@ class DeviceMover(Job):
             device.name = ""
             device.device_role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
             device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
-            device.asset_tag = ""
+            device.asset_tag = None
             device.tenant = None
             device.primary_ip4 = None
             device.secrets_group = None
