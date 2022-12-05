@@ -290,13 +290,13 @@ class DeviceMover(Job):
             if len(interface.ip_addresses.all()) > 0:
                 for ip in interface.ip_addresses.all():
                     ip.delete()
-        for interface in device_interfaces:    
-            try:
-                interface.validated_save()
+        # for interface in device_interfaces:    
+        #     try:
+        #         interface.validated_save()
             
-            except ValidationError as err:
-                self.log_failure(f"Device Validation Error: {err}")
-                raise err
+        #     except ValidationError as err:
+        #         self.log_failure(f"Device Validation Error: {err}")
+        #         raise err
 
     def run(self, data, commit):
         
