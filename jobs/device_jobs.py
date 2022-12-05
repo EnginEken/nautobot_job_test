@@ -290,6 +290,7 @@ class DeviceMover(Job):
             if len(interface.ip_addresses.all()) > 0:
                 for ip in interface.ip_addresses.all():
                     ip.delete()
+        for interface in device_interfaces:    
             try:
                 interface.validated_save()
             
