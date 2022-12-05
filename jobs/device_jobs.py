@@ -321,7 +321,7 @@ class DeviceMover(Job):
         
         
         if 'STORAGE' in dest_site.name:
-            self.clean_other_fields()
+            self.clean_other_fields(device)
             self.clean_interfaces(device.interfaces.all())
         
         try:
