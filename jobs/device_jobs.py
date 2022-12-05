@@ -270,6 +270,26 @@ class DeviceMover(Job):
     _INVENTORY_ROLE_ID = "37b7b3c9-20d0-4d17-bab4-221f79d94be4" # Şu an test nautobotu için id bu. Prod a alırken proddan almak gerekiyor.
     _STATUS_INVENTORY_ID = "019b2a93-3e3f-4ed9-92c4-ce5da0729348"
     _DELETABLE_FIELDS_FOR_INVENTORY = ['asset_tag', 'tenant', 'primary_ip4', 'primary_ip6', 'cluster', 'virtual_chassis', 'device_redundancy_group', 'device_redundancy_group_priority', 'vc_position', 'vc_priority', 'secrets_group', 'objects']
+    
+    def clean_other_fields(self, device):
+        device.name = device.serial
+        device.device_role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
+        device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
+        device.comments = ""
+
+        for attr in self._DELETABLE_FIELDS_FOR_INVENTORY:
+            setattr(device, attr, None)
+
+    def clean_interfaces(self, device_interfaces):
+        # Deleting all cables and ip addresses binded to any interface on the device.
+        for interface in device_interfaces:
+            if interface.cable:
+                interface.cable.delete()
+            interface.enabled = False
+            interface.mtu = None
+            if len(interface.ip_addresses.all()) > 0:
+                for ip in interface.ip_addresses.all():
+                    ip.delete()
 
     def run(self, data, commit):
         
@@ -299,16 +319,10 @@ class DeviceMover(Job):
         self.log_info(message=f"Setting device position to U{data['destination_u']}")
         device.position = dest_position
         
-        is_inventory_item = True if 'STORAGE' in dest_site.name else False
         
-        if is_inventory_item:
-            device.name = device.serial
-            device.device_role = DeviceRole.objects.get(id=self._INVENTORY_ROLE_ID)
-            device.status = Status.objects.get(id=self._STATUS_INVENTORY_ID)
-            device.comments = ""
-
-            for attr in self._DELETABLE_FIELDS_FOR_INVENTORY:
-                setattr(device, attr, None)
+        if 'STORAGE' in dest_site.name:
+            self.clean_other_fields()
+            self.clean_interfaces(device.interfaces.all())
         
         try:
             device.validated_save()
